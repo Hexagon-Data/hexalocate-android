@@ -1,0 +1,110 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+fastlane_version "2.47.0"
+
+default_platform :android
+
+platform :android do
+
+  desc "Runs all the tests"
+  lane :test do
+    gradle(
+      task: "jacocoTestReport"
+    )
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta_debug do
+    ensure_git_status_clean
+
+    # Run unit test
+    test
+
+    # build debug app
+    gradle(
+      task: "assemble",
+      build_type: "Debug",
+    )
+  
+    increment_version_code(
+      gradle_file_path: "example/build.gradle",
+    )
+
+    # Generate changelogs from git commits
+    changelog_from_git_commits
+
+    git_commit(
+      path: './example/build.gradle',
+      message: 'Increment version code; Deployed on Beta :rocket:',
+    )
+
+    # Upload to crashlytics
+    crashlytics(
+      api_token: ENV["CRASHLYTICS_API_KEY"],
+      build_secret: ENV["CRASHLTYICS_BUILD_SECRET"],
+    )
+
+    # post a message on slack
+    slack(
+      message: "Latest and greated app deployed to Crashlytics. :rocket: :shipit:",
+      success: true,
+    )
+    
+  end
+
+  desc "Deploy a new version of framework to maven repository"
+  lane :release do |lane|
+    
+    if !lane[:version]
+      raise "No version specified!".red
+    end
+    
+    #ensure_git_status_clean
+    #ensure_git_branch
+
+    version = lane[:version]
+    gradle(task: "publish")
+
+    s3_update_acl(
+      region: ENV['S3_REGION'],
+      bucket: ENV['S3_BUCKET'],
+      access_key: ENV['S3_ACCESS_KEY'],
+      secret_access_key: ENV['S3_SECRET_ACCESS_KEY'],
+      version: version
+    )
+
+    # post message to slack
+    slack(
+      message: 'Published new version of the SDK :rocket:',
+      success: true,
+      payload: {
+        'Version' => version,
+      },
+    )
+  end
+
+  error do |lane, exception|
+    slack(
+      message: exception.message,
+      success: false,
+    )
+  end
+end
+
+
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+# All available actions: https://docs.fastlane.tools/actions
+
+# fastlane reports which actions are used. No personal data is recorded. 
+# Learn more at https://github.com/fastlane/fastlane#metrics

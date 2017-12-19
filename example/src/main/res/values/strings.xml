@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">HexaLocate</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="track">Track</string>
+    <string name="please_wait">Please Wait</string>
+    <string name="loading">Loading</string>
+    <string name="sercive_started">Location service started</string>
+    <string name="sercive_stopped">Location service stopped</string>
+</resources>
