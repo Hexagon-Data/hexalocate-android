@@ -24,14 +24,14 @@ package com.hexalocate.android.core;
 final class Constants {
 
     // Default Location constants
-    static final long DEFAULT_LOCATION_INTERVAL_SEC = 3 * 60;
-    static final long DEFAULT_FAST_LOCATION_INTERVAL_SEC = 1 * 60;
-    static final long DEFAULT_TRANSMISSION_INTERVAL_SEC = 60 * 60;
+    static final long DEFAULT_LOCATION_INTERVAL_SEC = 45 * 60;
+    static final long DEFAULT_FAST_LOCATION_INTERVAL_SEC = 30 * 60;
+    static final long DEFAULT_TRANSMISSION_INTERVAL_SEC = 90 * 60;
     static final LocationAccuracy DEFAULT_LOCATION_ACCURACY = LocationAccuracy.HIGH;
 
     // Location service intent keys
-    static final String URL_KEY = "url";
-    static final String HEADER_KEY = "header";
+    static final String CLIENT_ID = "client_id";
+    static final String APP_ID = "app_id";
     static final String SERVICE_STATUS = "service_status";
     static final String TRACKING_STATUS = "tracking_status";
 
