@@ -30,12 +30,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.os.Build;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
@@ -45,8 +45,6 @@ import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-
-import java.util.HashMap;
 
 final class LocationServiceHelper {
 
@@ -66,8 +64,8 @@ final class LocationServiceHelper {
     private LocationDataSource locations;
     private LocationServiceHelper.LocationListener locationListener;
 
-    private String url;
-    private HashMap<String, String> headers;
+    private String clientId;
+    private String appId;
 
     private AdvertisingIdClient.Info advertisingInfo = new AdvertisingIdClient.Info("", true);
 
@@ -177,10 +175,10 @@ final class LocationServiceHelper {
     private void setValues(Intent intent) {
 
 
-        Log.d(TAG, "setValues: " + intent.getStringExtra(Constants.URL_KEY));
+        Log.d(TAG, "setValues: " + intent.getStringExtra(Constants.CLIENT_ID));
 
-        url = intent.getStringExtra(Constants.URL_KEY);
-        headers = (HashMap<String, String>) intent.getSerializableExtra(Constants.HEADER_KEY);
+        clientId = intent.getStringExtra(Constants.CLIENT_ID);
+        appId = intent.getStringExtra(Constants.APP_ID);
 
         advertisingInfo = new AdvertisingIdClient.Info(
                 intent.getStringExtra(Constants.ADVERTISING_ID_KEY),
@@ -272,15 +270,15 @@ final class LocationServiceHelper {
 
     private void scheduleDispatchLocationService() {
 
-        Log.e(TAG, "Google Api Client Connection Suspended : scheduleDispatchLocationService" + url );
+        Log.e(TAG, "Google Api Client Connection Suspended : scheduleDispatchLocationService" + clientId);
 
-        if(url == null || headers == null) {
+        if (clientId == null || appId == null) {
             return;
         }
 
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.URL_KEY, url);
-        bundle.putString(Constants.HEADER_KEY, headers.toString());
+        bundle.putString(Constants.CLIENT_ID, clientId);
+        bundle.putString(Constants.APP_ID, appId);
 
         PeriodicTask task = new PeriodicTask.Builder()
                 .setExtras(bundle)
@@ -347,7 +345,7 @@ final class LocationServiceHelper {
 
     private void startForeground() {
         Notification notification = new Notification.Builder(context)
-                    .build();
+                .build();
         ((LocationService) context).startForeground(FOREGROUND_SERVICE_TAG, notification);
     }
 
@@ -377,12 +375,12 @@ final class LocationServiceHelper {
         return locations;
     }
 
-    String getUrl() {
-        return url;
+    String getClientId() {
+        return clientId;
     }
 
-    HashMap<String, String> getHeaders() {
-        return headers;
+    public String getAppId() {
+        return appId;
     }
 
     AdvertisingIdClient.Info getAdvertisingInfo() {

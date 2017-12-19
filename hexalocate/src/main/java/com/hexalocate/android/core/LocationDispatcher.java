@@ -34,8 +34,10 @@ final class LocationDispatcher {
 
     private static final String TAG = LocationDispatcher.class.getSimpleName();
     private static final String LOCATIONS_KEY = "locations";
+    private static final String CLIENT_ID_KEY = "clientId";
+    private static final String APP_ID_KEY = "appId";
 
-    void postLocations(HttpClient httpClient, String url, HashMap<String, String> headers, final LocationDataSource dataSource) {
+    void postLocations(HttpClient httpClient, String url, HashMap<String, String> headers, final LocationDataSource dataSource, String clientId, String appId) {
         final List<HexaLocateLocation> locations = dataSource.popAll();
 
         if (locations == null || locations.isEmpty()) {
@@ -45,7 +47,7 @@ final class LocationDispatcher {
 
         httpClient.post(
                 url,
-                getLocationsParam(locations).toString(),
+                getRequestParams(locations, clientId, appId).toString(),
                 headers,
                 new HttpClientCallback() {
                     @Override
@@ -64,8 +66,9 @@ final class LocationDispatcher {
         );
     }
 
-    private JSONObject getLocationsParam(List<HexaLocateLocation> locationsToPost) {
+    private JSONObject getRequestParams(List<HexaLocateLocation> locationsToPost, String clientId, String appId) {
         JSONObject jsonObject = new JSONObject();
+
         JSONArray jsonArray = new JSONArray();
         for (HexaLocateLocation location : locationsToPost) {
             jsonArray.put(location.getJson());
@@ -73,6 +76,8 @@ final class LocationDispatcher {
 
         try {
             jsonObject.put(LOCATIONS_KEY, jsonArray);
+            jsonObject.put(CLIENT_ID_KEY, clientId);
+            jsonObject.put(APP_ID_KEY, appId);
         } catch (JSONException e) {
             Log.e(TAG, "JSON exception while posting locations " + e.getMessage());
         }

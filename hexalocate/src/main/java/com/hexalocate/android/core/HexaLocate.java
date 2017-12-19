@@ -47,7 +47,6 @@ import com.hexalocate.android.exceptions.InvalidConfigurationException;
 import com.hexalocate.android.exceptions.LocationDisabledException;
 import com.hexalocate.android.exceptions.LocationPermissionException;
 
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -61,9 +60,9 @@ public class HexaLocate implements HexaLocateLocationTracker {
     private static final String TAG = HexaLocate.class.getSimpleName();
 
     private Context context;
-    private String serverUrl;
+    private String clientId;
+    private String appId;
     private Configuration configuration;
-    private HashMap<String, String> headers;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -74,87 +73,18 @@ public class HexaLocate implements HexaLocateLocationTracker {
     public static final class Configuration implements Parcelable {
 
         Context context = null;
-        final String serverUrl;
-        final HashMap<String, String> headers;
-
-        private boolean isWifiCollectionDisabled;
-        private boolean isDeviceModelCollectionDisabled;
-        private boolean isDeviceManufacturerCollectionDisabled;
-        private boolean isOperatingSystemCollectionDisbaled;
-        private boolean isChargingInfoCollectionDisabled;
-        private boolean isCarrierNameCollectionDisabled;
-        private boolean isConnectionTypeCollectionDisabled;
-        private boolean isLocationMethodCollectionDisabled;
-        private boolean isLocationContextCollectionDisabled;
+        final String clientId;
+        final String appId;
 
         public static final class Builder {
             private Context context;
-            private String serverUrl;
-            private HashMap<String, String> headers;
+            private String clientId;
+            private String appId;
 
-            private boolean isWifiCollectionDisabled;
-            private boolean isDeviceModelCollectionDisabled;
-            private boolean isDeviceManufacturerCollectionDisabled;
-            private boolean isOperatingSystemCollectionDisbaled;
-            private boolean isChargingInfoCollectionDisabled;
-            private boolean isCarrierNameCollectionDisabled;
-            private boolean isConnectionTypeCollectionDisabled;
-            private boolean isLocationMethodCollectionDisabled;
-            private boolean isLocationContextCollectionDisabled;
-
-            public Builder(Context context, String serverUrl) {
+            public Builder(Context context, String clientId, String appId) {
                 this.context = context.getApplicationContext();
-                this.serverUrl = serverUrl;
-            }
-
-            public Builder setHeaders(HashMap<String, String> headers) {
-                this.headers = headers;
-                return this;
-            }
-
-            public Builder withoutWifiInfo() {
-                this.isWifiCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutDeviceModel() {
-                this.isDeviceModelCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutDeviceManufacturer() {
-                this.isDeviceManufacturerCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutOperatingSystem() {
-                this.isOperatingSystemCollectionDisbaled = true;
-                return this;
-            }
-
-            public Builder withoutChargingInfo() {
-                this.isChargingInfoCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutCarrierName() {
-                this.isCarrierNameCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutConnectionType() {
-                this.isConnectionTypeCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutLocationMethod() {
-                this.isLocationMethodCollectionDisabled = true;
-                return this;
-            }
-
-            public Builder withoutLocationContext() {
-                this.isLocationContextCollectionDisabled = true;
-                return this;
+                this.clientId = clientId;
+                this.appId = appId;
             }
 
             public Configuration build() {
@@ -164,17 +94,8 @@ public class HexaLocate implements HexaLocateLocationTracker {
 
         private Configuration(Builder builder) {
             this.context = builder.context;
-            this.serverUrl = builder.serverUrl;
-            this.headers = builder.headers;
-            this.isCarrierNameCollectionDisabled = builder.isCarrierNameCollectionDisabled;
-            this.isChargingInfoCollectionDisabled = builder.isChargingInfoCollectionDisabled;
-            this.isConnectionTypeCollectionDisabled = builder.isConnectionTypeCollectionDisabled;
-            this.isDeviceManufacturerCollectionDisabled = builder.isDeviceManufacturerCollectionDisabled;
-            this.isDeviceModelCollectionDisabled = builder.isDeviceModelCollectionDisabled;
-            this.isLocationContextCollectionDisabled = builder.isLocationContextCollectionDisabled;
-            this.isLocationMethodCollectionDisabled = builder.isLocationMethodCollectionDisabled;
-            this.isOperatingSystemCollectionDisbaled = builder.isOperatingSystemCollectionDisbaled;
-            this.isWifiCollectionDisabled = builder.isWifiCollectionDisabled;
+            this.clientId = builder.clientId;
+            this.appId = builder.appId;
         }
 
         @Override
@@ -184,31 +105,13 @@ public class HexaLocate implements HexaLocateLocationTracker {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(this.serverUrl);
-            dest.writeSerializable(this.headers);
-            dest.writeByte(this.isWifiCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isDeviceModelCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isDeviceManufacturerCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isOperatingSystemCollectionDisbaled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isChargingInfoCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isCarrierNameCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isConnectionTypeCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isLocationMethodCollectionDisabled ? (byte) 1 : (byte) 0);
-            dest.writeByte(this.isLocationContextCollectionDisabled ? (byte) 1 : (byte) 0);
+            dest.writeString(this.clientId);
+            dest.writeString(this.appId);
         }
 
         protected Configuration(Parcel in) {
-            this.serverUrl = in.readString();
-            this.headers = (HashMap<String, String>) in.readSerializable();
-            this.isWifiCollectionDisabled = in.readByte() != 0;
-            this.isDeviceModelCollectionDisabled = in.readByte() != 0;
-            this.isDeviceManufacturerCollectionDisabled = in.readByte() != 0;
-            this.isOperatingSystemCollectionDisbaled = in.readByte() != 0;
-            this.isChargingInfoCollectionDisabled = in.readByte() != 0;
-            this.isCarrierNameCollectionDisabled = in.readByte() != 0;
-            this.isConnectionTypeCollectionDisabled = in.readByte() != 0;
-            this.isLocationMethodCollectionDisabled = in.readByte() != 0;
-            this.isLocationContextCollectionDisabled = in.readByte() != 0;
+            this.clientId = in.readString();
+            this.appId = in.readString();
         }
 
         public static final Parcelable.Creator<Configuration> CREATOR = new Parcelable.Creator<Configuration>() {
@@ -223,63 +126,28 @@ public class HexaLocate implements HexaLocateLocationTracker {
             }
         };
 
-        public String getUrl() {
-            return serverUrl;
+        public String getClientId() {
+            return clientId;
         }
 
-        public HashMap<String, String> getHeaders() {
-            return headers;
-        }
-
-        public boolean isWifiCollectionDisabled() {
-            return isWifiCollectionDisabled;
-        }
-
-        public boolean isDeviceModelCollectionDisabled() {
-            return isDeviceModelCollectionDisabled;
-        }
-
-        public boolean isDeviceManufacturerCollectionDisabled() {
-            return isDeviceManufacturerCollectionDisabled;
-        }
-
-        public boolean isOperaringSystemCollectionDisbaled() {
-            return isOperatingSystemCollectionDisbaled;
-        }
-
-        public boolean isChargingInfoCollectionDisabled() {
-            return isChargingInfoCollectionDisabled;
-        }
-
-        public boolean isCarrierNameCollectionDisabled() {
-            return isCarrierNameCollectionDisabled;
-        }
-
-        public boolean isConnectionTypeCollectionDisabled() {
-            return isConnectionTypeCollectionDisabled;
-        }
-
-        public boolean isLocationMethodCollectionDisabled() {
-            return isLocationMethodCollectionDisabled;
-        }
-
-        public boolean isLocationContextCollectionDisabled() {
-            return isLocationContextCollectionDisabled;
+        public String getAppId() {
+            return appId;
         }
     }
 
     private HexaLocate(Configuration configuration) {
-            this.context = configuration.context;
-            this.serverUrl = configuration.serverUrl;
-            this.headers = configuration.headers;
-            this.configuration = configuration;
-            setPreferences();
+        this.context = configuration.context;
+        this.clientId = configuration.clientId;
+        this.appId = configuration.appId;
+        this.configuration = configuration;
+        setPreferences();
     }
 
     private void setPreferences() {
         SharedPreferences preferences = context.getSharedPreferences(Constants.HEXALOCATE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(Constants.URL_KEY, configuration.getUrl());
+        editor.putString(Constants.CLIENT_ID, configuration.getClientId());
+        editor.putString(Constants.APP_ID, configuration.getAppId());
         editor.apply();
     }
 
@@ -308,7 +176,7 @@ public class HexaLocate implements HexaLocateLocationTracker {
     }
 
     @Override
-    public void startTracking(Activity activity)  {
+    public void startTracking(Activity activity) {
 
         int resultCode = isGooglePlayServicesAvailable();
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -413,8 +281,8 @@ public class HexaLocate implements HexaLocateLocationTracker {
     private void onFetchAdvertisingInfo(AdvertisingIdClient.Info info) {
         Intent intent = new Intent(context, LocationService.class);
 
-        intent.putExtra(Constants.URL_KEY, serverUrl);
-        intent.putExtra(Constants.HEADER_KEY, headers);
+        intent.putExtra(Constants.CLIENT_ID, clientId);
+        intent.putExtra(Constants.APP_ID, appId);
         updateLocationConfigurationInfo(intent);
         updateFieldsConfigurationInfo(intent);
 
@@ -434,7 +302,7 @@ public class HexaLocate implements HexaLocateLocationTracker {
     }
 
     private void updateFieldsConfigurationInfo(Intent intent) {
-       intent.putExtra(Constants.INTENT_CONFIGURATION,configuration);
+        intent.putExtra(Constants.INTENT_CONFIGURATION, configuration);
     }
 
     private void updateAdvertisingInfo(Intent intent, String advertisingId, boolean isLimitedAdTrackingEnabled) {
@@ -449,8 +317,8 @@ public class HexaLocate implements HexaLocateLocationTracker {
     }
 
     private static void saveConfiguration(Configuration configuration) throws InvalidConfigurationException {
-        if (TextUtils.isEmpty(configuration.serverUrl)) {
-            String message = "Invalid configuration. Please configure a valid url or header.";
+        if (TextUtils.isEmpty(configuration.clientId) || TextUtils.isEmpty(configuration.appId)) {
+            String message = "Invalid configuration. Please configure a valid client id and app id.";
 
             Log.e(TAG, message);
             throw new InvalidConfigurationException(
@@ -458,9 +326,9 @@ public class HexaLocate implements HexaLocateLocationTracker {
             );
         }
 
-        if(!TextUtils.isEmpty(configuration.getUrl())) {
-            SharedPreferenceUtils.getInstance(configuration.context).setValue(Constants.URL_KEY, configuration.getUrl());
-            SharedPreferenceUtils.getInstance(configuration.context).saveMap(Constants.HEADER_KEY, configuration.getHeaders());
+        if (!TextUtils.isEmpty(configuration.getClientId()) && !TextUtils.isEmpty(configuration.getAppId())) {
+            SharedPreferenceUtils.getInstance(configuration.context).setValue(Constants.CLIENT_ID, configuration.getClientId());
+            SharedPreferenceUtils.getInstance(configuration.context).setValue(Constants.APP_ID, configuration.getAppId());
         }
 
     }

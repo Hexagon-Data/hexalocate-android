@@ -35,31 +35,17 @@ final class InformationFieldsFactory {
         this.context = context;
 
         updateDeviceInfo();
-
-        if (!this.configuration.isCarrierNameCollectionDisabled()) {
-            updateCarrierName();
-        }
-
-        if (!this.configuration.isWifiCollectionDisabled()) {
-            updateWifiInfo();
-        }
-
-        if (!this.configuration.isConnectionTypeCollectionDisabled()) {
-            updateConnectionType();
-        }
-
-        if (!this.configuration.isLocationMethodCollectionDisabled()) {
-            updateLocationProvider();
-        }
-        if (!this.configuration.isLocationContextCollectionDisabled()) {
-            updateLocationContext();
-        }
+        updateCarrierName();
+        updateWifiInfo();
+        updateConnectionType();
+        updateLocationProvider();
+        updateLocationContext();
 
     }
 
     public static InformationFields collectInformationFields(Context context, HexaLocate.Configuration configuration) {
 
-        InformationFieldsFactory informationFieldsFactory =  new InformationFieldsFactory(context, configuration);
+        InformationFieldsFactory informationFieldsFactory = new InformationFieldsFactory(context, configuration);
 
         return InformationFields.from(informationFieldsFactory.manufacturer, informationFieldsFactory.model, informationFieldsFactory.isCharging,
                 informationFieldsFactory.operatingSystem, informationFieldsFactory.carrierName, informationFieldsFactory.wifiSsid,
@@ -72,31 +58,21 @@ final class InformationFieldsFactory {
                                                          String wifiBSSID, String connectionType, String locationMethod, String locationContext) {
 
         return InformationFields.from(deviceManufacturer, deviceModel, chargingState,
-                                      operatingSystem, carrierName, wifiSSID,
-                                      wifiBSSID, connectionType, locationMethod, locationContext);
+                operatingSystem, carrierName, wifiSSID,
+                wifiBSSID, connectionType, locationMethod, locationContext);
     }
 
     private void updateDeviceInfo() {
 
-        if (!configuration.isDeviceManufacturerCollectionDisabled()) {
-            this.manufacturer = Build.MANUFACTURER;
-        }
-
-        if (!configuration.isDeviceModelCollectionDisabled()) {
-            this.model = Build.MODEL;
-        }
-
-        if (!configuration.isOperaringSystemCollectionDisbaled()) {
-            this.operatingSystem = BASE_NAME + " " + Build.VERSION.RELEASE;
-        }
-
-        if (!configuration.isChargingInfoCollectionDisabled()) {
-            Intent batteryIntent = context.registerReceiver(
-                    null,
-                    new IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            );
-            this.isCharging = String.valueOf(isDeviceCharging(batteryIntent));
-        }
+        this.manufacturer = Build.MANUFACTURER;
+        this.model = Build.MODEL;
+        this.model = Build.MODEL;
+        this.operatingSystem = BASE_NAME + " " + Build.VERSION.RELEASE;
+        Intent batteryIntent = context.registerReceiver(
+                null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        );
+        this.isCharging = String.valueOf(isDeviceCharging(batteryIntent));
     }
 
     private void updateLocationContext() {

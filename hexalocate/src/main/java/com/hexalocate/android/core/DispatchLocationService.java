@@ -36,13 +36,19 @@ final public class DispatchLocationService extends GcmTaskService {
         SQLiteOpenHelper helper = new DatabaseHelper(this);
         LocationDataSource dataSource = new LocationDatabase(helper);
 
-        String url = taskParams.getExtras().getString(Constants.URL_KEY);
-        HashMap<String, String> headers = Utils.hashMapFromString(taskParams.getExtras().getString(Constants.HEADER_KEY));
+        String url = "https://parseapi.back4app.com/functions/postLocations";
+        String clientId = taskParams.getExtras().getString(Constants.CLIENT_ID);
+        String appId = taskParams.getExtras().getString(Constants.APP_ID);
+
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("X-Parse-Application-Id", "R42lGezzQzhymEcAXWJpYtNPlUHswxQJig4b6Qqm");
+        headers.put("X-Parse-REST-API-Key", "GH0Rh5pkyHvKPHo5G6J0eQDLnFuDiLv30drUEDTt");
+        headers.put("Content-Type", "application/json");
 
         HttpClient httpClient = new HttpClientImpl();
 
         LocationDispatcher dispatcher = new LocationDispatcher();
-        dispatcher.postLocations(httpClient, url, headers, dataSource);
+        dispatcher.postLocations(httpClient, url, headers, dataSource, clientId, appId);
 
         return GcmNetworkManager.RESULT_SUCCESS;
     }
