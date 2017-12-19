@@ -12,15 +12,7 @@ public class ExampleApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer <TOKEN>");
-
-        HexaLocate.Configuration configuration = new HexaLocate.Configuration.Builder(this, "https://api.safegraph.com/v1/provider/<UUID>/devicelocation")
-                .setHeaders(headers)
-                .withoutDeviceManufacturer()
-                .withoutDeviceModel()
-                .build();
-
+        HexaLocate.Configuration configuration = new HexaLocate.Configuration.Builder(this, "CKrNMFr1eI","XZYxnZJoJJ").build();
         HexaLocate.initialize(configuration);
     }
 }
