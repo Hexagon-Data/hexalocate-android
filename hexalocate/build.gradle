@@ -1,6 +1,30 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'hexalocate'
+
+    publishedGroupId = 'io.hexagondata'
+    libraryName = 'hexalocate'
+    artifact = 'hexalocate'
+
+    libraryDescription = 'Tracking SDK'
+
+    siteUrl = 'https://github.com/Hexagon-Data/hexalocate-android'
+    gitUrl = 'https://github.com/Hexagon-Data/hexalocate-android.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'hexagondata'
+    developerName = 'Hexagondata'
+    developerEmail = 'info@hexagondata.io'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/OpenLocate/openlocate-android/blob/master/LICENSE'
+    allLicenses = ["MIT"]
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
@@ -50,3 +74,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.json:json:20170516'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
