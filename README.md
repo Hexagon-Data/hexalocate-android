@@ -41,8 +41,7 @@ public class MyApplication extends Application {
 Activity should be passed to method below. Library will request permission for you.
 
 ```java
- 
-HexaLocate.getInstance().startTracking(activity);
+ HexaLocate.getInstance().startTracking(activity);
 ```
 `startTracking` method can be called only once: library will restart tracking on next initialization.
 
@@ -69,4 +68,3 @@ HexaLocate requires users to accept the Android's Location Permission in order t
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
-# hexalocate-android
